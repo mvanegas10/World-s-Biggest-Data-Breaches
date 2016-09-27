@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<head>
+  <meta charset="utf-8">
+  <link rel="stylesheet" type="text/css" href="style.css">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+  <script src="https://d3js.org/d3.v4.min.js"></script>
+  <script src="http://code.jquery.com/jquery-1.10.2.min.js"></script>
+</head>
+<body>
+  <div class="row" id="title">
+    <div class="col-md-1"></div>
+    <div class="col-md-10"><h1>Leaks in past years</h1></div>
+    <div class="col-md-1"></div>
+  </div>
+  <div class="row">
+    <div class="col-md-1"></div>
+    <div class="col-md-10" id="titleChart"><p></p></div>
+    <div class="col-md-1"></div>
+  </div>
+  <div class="row">
+    <div class="col-md-1"></div>
+    <div class="col-md-10" id="chart"></div>
+    <div class="col-md-1"></div>
+  </div>
+    <div class="row">
+    <div class="col-md-1"></div>
+    <div class="col-md-10" id="titleEntities"><p></p></div>
+    <div class="col-md-1"></div>
+  </div>
+  <div class="row">
+    <div class="col-md-7" id="entities"></div>
+    <div class="col-md-5" id="detail">
+      <h3 id="titleDetail"></h3>
+      <h4 id="story"></h4> 
+      <a id="source"></a> 
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-2"></div>
+    <div class="col-md-8" id="return"><button onclick="window.location.hash = '#title';">Return to chart</button></div>
+    <div class="col-md-2"></div>
+  </div>
+  <div class="row" style="height:50px"></div>
+  <script src="vis.js"></script>
+</body>
