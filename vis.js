@@ -59,9 +59,10 @@ var yAxis = svgChart.append("g")
   .attr("class", "axis y--axis");
 
 // Data objects
-var organizationData = []
-var methodData = []
-var columns = []
+var organizationData = [];
+var methodData = [];
+var columns = [];
+var methodSelected = "Show all";
 
 var xPositions = [-359, -294, -230, -164, -99, -34, 30, 95, 161, 225, 291, 355, 420];
 
@@ -144,6 +145,7 @@ function update(data, attrX, selected) {
       }
       else {
         update(data, "year", [d]);
+        methodSelected = d;
       } 
     })
     .attr("fill", function (d) {
@@ -169,6 +171,7 @@ function update(data, attrX, selected) {
       }
       else {
         update(data, "year", [d]);
+        methodSelected = d;
       } 
     })
     .text(function(d) { return d; });
@@ -192,33 +195,61 @@ function updateEntities (data) {
   var mergedNode = node.merge(nodeEnter)
     .attr("transform", function(d) { 
         return "translate(" + d.x + "," + d.y + ")"; })
-    .attr("class", "node");
+    .attr("class", "node")
+    .each(function (d) {
 
-  mergedNode.append("circle")
-    .attr("id", function(d) { return "node-" + d.data.Entity; })
-    .attr("r", function(d) { return d.r; })
+      var circle = nodeEnter.selectAll("circle")
+        .data([d]);
+
+      var circleEnter = circle.enter().append("circle");
+
+      circle.merge(circleEnter)
+        .attr("id", function(d) { return "node-" + d.data.Entity; })
+        .attr("r", function(d) { return d.r; })
+        .on("click", function(d) { 
+          updateDetail(objectToArray(d.data)); 
+        });
+
+      var clipPath = nodeEnter.selectAll("clipPath")
+        .data([d]);
+
+      var clipPathEnter = clipPath.enter().append("clipPath");
+
+      clipPath.merge(clipPathEnter)
+        .attr("id", function(d) { return "clip-" + d.data.Entity; })
+        .append("use")
+          .attr("xlink:href", function(d) { return "#node-" + d.data.Entity + ""; });
+
+      var text = nodeEnter.selectAll("text")
+        .data([d]);
+
+      var textEnter = text.enter().append("text");
+
+      text.merge(textEnter)
+        .attr("text-anchor","middle")
+        .style("font-size","10")
+        .attr("clip-path", function(d) { return "url(#clip-" + d.data.Entity + ")"; })
+        .selectAll("tspan")
+          .data(function(d) { return d.data.Entity.split(/(?=[A-Z][^A-Z])/g); })
+        .enter().append("tspan")
+          .attr("x", 0)
+          .attr("y", function(d, i, nodes) { return 13 + (i - nodes.length / 2 - 0.5) * 10; })
+          .text(function(d) { return d; });
+
+      text.exit().remove();
+
+      clipPath.exit().remove();
+
+      circle.exit().remove();
+
+      console.log(circle);
+    });
+
+  mergedNode.append("title")
+    .text(function(d) { return d.data.Entity + "\n" + format(d.value); })
     .on("click", function(d) { 
       updateDetail(objectToArray(d.data)); 
     });
-
-  mergedNode.append("clipPath")
-    .attr("id", function(d) { return "clip-" + d.data.Entity; })
-    .append("use")
-      .attr("xlink:href", function(d) { return "#node-" + d.data.Entity + ""; });
-
-  mergedNode.append("text")
-    .attr("text-anchor","middle")
-    .style("font-size","10")
-    .attr("clip-path", function(d) { return "url(#clip-" + d.data.Entity + ")"; })
-    .selectAll("tspan")
-      .data(function(d) { return d.data.Entity.split(/(?=[A-Z][^A-Z])/g); })
-    .enter().append("tspan")
-      .attr("x", 0)
-      .attr("y", function(d, i, nodes) { return 13 + (i - nodes.length / 2 - 0.5) * 10; })
-      .text(function(d) { return d; });
-
-  mergedNode.append("title")
-    .text(function(d) { return d.data.Entity + "\n" + format(d.value); });
 
   node.exit().remove();
 }
@@ -259,8 +290,14 @@ function dragged(d) {
   for (var i = 0; i < xPositions.length; i++) {
     if(between(d3.event.x- 405, xPositions[i]-16,xPositions[i]+16)) {
       d3.select(this).attr("transform", "translate(" + xPositions[i] + "," + 0 + ")");
-      updateEntities(organizationData.filter(function (d) {return d.year === (i+2004);}));
-      updateDetail(objectToArray(organizationData.filter(function (d) {return d.year === (i+2004);})[0]));
+      if (methodSelected === "Show all") {
+        updateEntities(organizationData.filter(function (d) {return d.year === (i+2004);}));
+        updateDetail(objectToArray(organizationData.filter(function (d) {return d.year === (i+2004);})[0]));
+      }
+      else {
+        updateEntities(organizationData.filter(function (d) {return (d.year === (i+2004) && d["Method of Leak"] === methodSelected);}));
+        updateDetail(objectToArray(organizationData.filter(function (d) {return (d.year === (i+2004) && d["Method of Leak"] === methodSelected);}[0])));
+      }
     } 
   };
 }
@@ -360,6 +397,6 @@ d3.csv("data.csv", function(err, data) {
   methodData.columns = columns;
   z.domain(data.columns);
   update(methodData, "year");
-  updateEntities(organizationData.filter(function (d) {return d.year === 2016;}));
-  updateDetail(objectToArray(organizationData.filter(function (d) {return d.year === 2016;})[0]));
+  updateEntities(organizationData.filter(function (d) {return d.year === 2010;}));
+  updateDetail(objectToArray(organizationData.filter(function (d) {return d.year === 2010;})[0]));
 });

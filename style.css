@@ -6,7 +6,7 @@ body {
   left:0;
 }
 
-.line path {
+path {
   z-index: 100000;
 }
 
