@@ -34,7 +34,7 @@ var line = d3.line()
   .x(392)
   .y(function(d) { 
     if (d.value === 0) return 260;
-    else return 0; 
+    else return -20; 
   });
 
 svgChart.append("path") 
