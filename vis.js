@@ -132,6 +132,12 @@ function update(data, attrX, selected) {
       .attr("class", "legend")
       .attr("transform", function(d, i) { return "translate(0," + i * 20 + ")"; })
       .style("font", "10px sans-serif");
+      
+  svgChart.append("text")
+    .attr("x", width - 133)
+    .attr("y", -5)
+    .style("font-size","16px")
+    .text("Select a method of leak:");
 
   legend.append("rect")
     .attr("x", width - 80)
@@ -155,7 +161,10 @@ function update(data, attrX, selected) {
     });
 
   legend.append("text")
-    .attr("x", width - 60)
+    .attr("x", function(d) {
+      if (d === "Show all") return  width - 80
+      else return width - 60;
+    })
     .attr("y", 9)
     .attr("dy", ".35em")
     .style("font-size", function (d,i) {
@@ -285,16 +294,22 @@ function dragged(d) {
     if(between(d3.event.x- 405, xPositions[i]-16,xPositions[i]+16)) {
       d3.select(this).attr("transform", "translate(" + xPositions[i] + "," + 0 + ")");
       if (methodSelected === "Show all") {
+        d3.select("#entitiesTitle").text("Injured parties in " + (i+2004) + ":");
+        d3.select("#continue").text("Select an entity to see details");
         updateEntities(organizationData.filter(function (d) {return d.year === (i+2004);}));
         updateDetail(objectToArray(organizationData.filter(function (d) {return d.year === (i+2004);})[0]));
       }
       else {
         var organizations = organizationData.filter(function (d) {return (d.year === (i+2004) && d["Method of Leak"] === methodSelected);});
         if (organizations.length !== 0) {
+          d3.select("#entitiesTitle").text("Injured parties of " + methodSelected + " in " + (i+2004) + ":");
+          d3.select("#continue").text("Select an entity to see details");
           updateEntities(organizationData.filter(function (d) {return (d.year === (i+2004) && d["Method of Leak"] === methodSelected);}));
           updateDetail(objectToArray(organizations[0]));
         }
         else {
+          d3.select("#entitiesTitle").text("There were no data breaches related to " + methodSelected + " methods in " + (i+2004));
+          d3.select("#continue").text("");
           d3.select("#entities").html("");
           d3.select("#entities").selectAll("*").remove();
           updateDetail();
@@ -399,6 +414,8 @@ d3.csv("data.csv", function(err, data) {
   methodData.columns = columns;
   z.domain(data.columns);
   update(methodData, "year");
+  d3.select("#entitiesTitle").text("Injured parties in 2010:");
+  d3.select("#continue").text("Select an entity to see details");
   updateEntities(organizationData.filter(function (d) {return d.year === 2010;}));
   updateDetail(objectToArray(organizationData.filter(function (d) {return d.year === 2010;})[0]));
 });
