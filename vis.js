@@ -20,7 +20,7 @@ var format = d3.format(",d");
 
 var pack = d3.pack()
   .size([800, 800])
-  .padding(20);
+  .padding(3);
 
 var dataPath = [{"year":2010,"value":0},{"year":2010,"value":700000000}];
 
@@ -140,6 +140,7 @@ function update(data, attrX, selected) {
     .on("click", function(d) { 
       if (d === "Show all") {
         update(data, "year");
+        methodSelected = "Show all";
       }
       else {
         update(data, "year", [d]);
@@ -166,6 +167,7 @@ function update(data, attrX, selected) {
     .on("click", function(d) { 
       if (d === "Show all") {
         update(data, "year");
+        methodSelected = "Show all";
       }
       else {
         update(data, "year", [d]);
@@ -261,7 +263,6 @@ function dragstarted(d) {
 }
 
 function dragged(d) {
-  console.log("-----------------------------------------------");
   for (var i = 0; i < xPositions.length; i++) {
     if(between(d3.event.x- 405, xPositions[i]-16,xPositions[i]+16)) {
       d3.select(this).attr("transform", "translate(" + xPositions[i] + "," + 0 + ")");
