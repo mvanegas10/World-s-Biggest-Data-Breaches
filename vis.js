@@ -302,7 +302,7 @@ function dragged(d) {
     if(between(d3.event.x- 405, xPositions[i]-16,xPositions[i]+16)) {
       d3.select(this).attr("transform", "translate(" + xPositions[i] + "," + 0 + ")");
       if (methodSelected === "Show all") {
-        d3.select("#entitiesTitle").text("Injured parties in " + (i+2004) + ":");
+        d3.select("#entitiesTitle").text("Injured parties in " + (i+2004));
         d3.select("#continue").text("Select an entity to see details");
         updateEntities(organizationData.filter(function (d) {return d.year === (i+2004);}));
         updateDetail(objectToArray(organizationData.filter(function (d) {return d.year === (i+2004);})[0]));
@@ -310,7 +310,7 @@ function dragged(d) {
       else {
         var organizations = organizationData.filter(function (d) {return (d.year === (i+2004) && d["Method of Leak"] === methodSelected);});
         if (organizations.length !== 0) {
-          d3.select("#entitiesTitle").text("Injured parties of " + methodSelected + " in " + (i+2004) + ":");
+          d3.select("#entitiesTitle").text("Injured parties of " + methodSelected + " in " + (i+2004));
           d3.select("#continue").text("Select an entity to see details");
           updateEntities(organizationData.filter(function (d) {return (d.year === (i+2004) && d["Method of Leak"] === methodSelected);}));
           updateDetail(objectToArray(organizations[0]));
@@ -380,7 +380,7 @@ d3.csv("data.csv", function(err, data) {
     organization["sourceLink1"]=d["1st source link"];
     organization["sourceLink2"]=d["1nd source link"];
     organization["sourceLink3"]=d["3rd source"];
-    organization["sourceName"]=d["source name"];
+    organization["Source Name"]=d["source name"];
     organizationData.push(organization);
 
     var encontro = false;
@@ -422,7 +422,7 @@ d3.csv("data.csv", function(err, data) {
   methodData.columns = columns;
   z.domain(data.columns);
   update(methodData, "year");
-  d3.select("#entitiesTitle").text("Injured parties in 2010:");
+  d3.select("#entitiesTitle").text("Injured parties in 2010");
   d3.select("#continue").text("Select an entity to see details");
   updateEntities(organizationData.filter(function (d) {return d.year === 2010;}));
   updateDetail(objectToArray(organizationData.filter(function (d) {return d.year === 2010;})[0]));
