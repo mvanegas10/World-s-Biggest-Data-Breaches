@@ -117,14 +117,22 @@ function update(data, attrX, selected) {
     .attr("transform", "translate(0," + height + ")")
     .call(d3.axisBottom(xScale));
 
-  yAxis
+  var yAxisCall = yAxis
     .attr("class", "axis axis--y")
-    .call(d3.axisLeft(yScale).ticks(10, "s"))
-    .append("text")
-      .attr("x", 2)
-      .attr("y", yScale(yScale.ticks(10).pop()))
-      .attr("dy", "0.35em")
-      .attr("fill", "#000");
+    .call(d3.axisLeft(yScale).ticks(10, "s"));
+
+  yAxisCall.append("text")
+    .attr("x", 2)
+    .attr("y", yScale(yScale.ticks(10).pop()))
+    .attr("dy", "0.35em")
+    .attr("fill", "#000");
+
+  yAxisCall.append("text")
+    .attr("x", 90)
+    .attr("y", -8)
+    .attr("fill", "#000")
+    .style("font-size","11px")
+    .text("Records stolen in millions");
 
   var legend = svgChart.selectAll(".legend")
     .data(data.columns.reverse())
