@@ -20,7 +20,7 @@ var format = d3.format(",d");
 
 var pack = d3.pack()
   .size([800, 800])
-  .padding(3);
+  .padding(20);
 
 var svgChart = d3.select("#chart").append("svg")
   .attr("width", width + margin.left + margin.right)
@@ -46,11 +46,7 @@ svgChart.append("path")
   .call(d3.drag()
     .on("start", dragstarted)
     .on("drag", dragged)
-    .on("end", dragended));
-
-var svgEntities = d3.select("#entities").append("svg")
-  .attr("width", 900)
-  .attr("height", 900);      
+    .on("end", dragended)); 
 
 var xAxis = svgChart.append("g")
   .attr("class", "axis x--axis");
@@ -177,7 +173,14 @@ function update(data, attrX, selected) {
     .text(function(d) { return d; });
 }
 
-function updateEntities (data) {
+function updateEntities (data) {  
+  d3.select("#entities").html("");
+  d3.select("#entities").selectAll("*").remove();
+
+  var svgEntities = d3.select("#entities").append("svg")
+    .attr("width", 900)
+    .attr("height", 900);   
+
   var root = d3.hierarchy({children: data})
     .sum(function(d) { 
       if (d["Records Stolen"] === undefined) d["Records Stolen"] = 0;
@@ -188,70 +191,39 @@ function updateEntities (data) {
   pack(root);
 
   var node = svgEntities.selectAll("g")
-    .data(root.children);
-    
-  var nodeEnter = node.enter().append("g");
-
-  var mergedNode = node.merge(nodeEnter)
+    .data(root.children)
+    .enter().append("g")
     .attr("transform", function(d) { 
         return "translate(" + d.x + "," + d.y + ")"; })
-    .attr("class", "node")
-    .each(function (d) {
+    .attr("class", "node");
 
-      var circle = nodeEnter.selectAll("circle")
-        .data([d]);
-
-      var circleEnter = circle.enter().append("circle");
-
-      circle.merge(circleEnter)
-        .attr("id", function(d) { return "node-" + d.data.Entity; })
-        .attr("r", function(d) { return d.r; })
-        .on("click", function(d) { 
-          updateDetail(objectToArray(d.data)); 
-        });
-
-      var clipPath = nodeEnter.selectAll("clipPath")
-        .data([d]);
-
-      var clipPathEnter = clipPath.enter().append("clipPath");
-
-      clipPath.merge(clipPathEnter)
-        .attr("id", function(d) { return "clip-" + d.data.Entity; })
-        .append("use")
-          .attr("xlink:href", function(d) { return "#node-" + d.data.Entity + ""; });
-
-      var text = nodeEnter.selectAll("text")
-        .data([d]);
-
-      var textEnter = text.enter().append("text");
-
-      text.merge(textEnter)
-        .attr("text-anchor","middle")
-        .style("font-size","10")
-        .attr("clip-path", function(d) { return "url(#clip-" + d.data.Entity + ")"; })
-        .selectAll("tspan")
-          .data(function(d) { return d.data.Entity.split(/(?=[A-Z][^A-Z])/g); })
-        .enter().append("tspan")
-          .attr("x", 0)
-          .attr("y", function(d, i, nodes) { return 13 + (i - nodes.length / 2 - 0.5) * 10; })
-          .text(function(d) { return d; });
-
-      text.exit().remove();
-
-      clipPath.exit().remove();
-
-      circle.exit().remove();
-
-      console.log(circle);
-    });
-
-  mergedNode.append("title")
-    .text(function(d) { return d.data.Entity + "\n" + format(d.value); })
+    node.append("circle")
+    .attr("id", function(d) { return "node-" + d.data.Entity; })
+    .attr("r", function(d) { return d.r; })
     .on("click", function(d) { 
       updateDetail(objectToArray(d.data)); 
     });
+    
+    node.append("clipPath")
+    .attr("id", function(d) { return "clip-" + d.data.Entity; })
+    .append("use")
+      .attr("xlink:href", function(d) { return "#node-" + d.data.Entity + ""; });
 
-  node.exit().remove();
+
+    node.append("text")
+    .attr("text-anchor","middle")
+    .style("font-size","10")
+    .attr("clip-path", function(d) { return "url(#clip-" + d.data.Entity + ")"; })
+    .selectAll("tspan")
+      .data(function(d) { return d.data.Entity.split(/(?=[A-Z][^A-Z])/g); })
+    .enter().append("tspan")
+      .attr("x", 0)
+      .attr("y", function(d, i, nodes) { return 13 + (i - nodes.length / 2 - 0.5) * 10; })
+      .text(function(d) { return d; });
+
+    node.append("title")
+    .text(function(d) { return d.data.Entity + "\n" + format(d.value); });
+  
 }
 
 function updateDetail(data) {
@@ -287,6 +259,7 @@ function dragstarted(d) {
 }
 
 function dragged(d) {
+  console.log("-----------------------------------------------");
   for (var i = 0; i < xPositions.length; i++) {
     if(between(d3.event.x- 405, xPositions[i]-16,xPositions[i]+16)) {
       d3.select(this).attr("transform", "translate(" + xPositions[i] + "," + 0 + ")");
