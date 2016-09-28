@@ -231,31 +231,49 @@ function updateEntities (data) {
 }
 
 function updateDetail(data) {
+  if (data !== undefined) {
+    d3.select("#titleDetail").text(data.Entity + " (" + data.Year + ")");
 
-  d3.select("#titleDetail").text(data.Entity + " (" + data.Year + ")");
+    d3.select("#story").text(data.Story);
 
-  d3.select("#story").text(data.Story);
+    if (data.sources.length !== 0) {
+      d3.select("#source")
+        .text("Read More")
+        .attr("xlink:href", data.sources[0]["value"])
+        .on("click", function() { window.open(data.sources[0]["value"]);});
+    }
 
-  if (data.sources.length !== 0) {
-    d3.select("#source")
-      .text("Read More")
-      .attr("xlink:href", data.sources[0]["value"])
-      .on("click", function() { window.open(data.sources[0]["value"]);});
+    var detailText = d3.select("#detail").selectAll("p")
+      .data(data.data);
+
+    var detailTextEnter = detailText.enter().append("p");
+
+    detailText.merge(detailTextEnter)
+      .attr("x",0)
+      .attr("y", function (d,i) {
+        return i * 30;})
+      .text(function (d) {return d.key + ": " + d.value;});
+
+    detailText.exit().remove()
   }
+  else {
+    d3.select("#titleDetail").text("");
+    d3.select("#story").text("");
+    d3.select("#source")
+      .text("");
+    var detailText = d3.select("#detail").selectAll("p")
+      .data([]);
 
-  var detailText = d3.select("#detail").selectAll("p")
-    .data(data.data);
+    var detailTextEnter = detailText.enter().append("p");
 
-  var detailTextEnter = detailText.enter().append("p");
+    detailText.merge(detailTextEnter)
+      .attr("x",0)
+      .attr("y", function (d,i) {
+        return i * 30;})
+      .text(function (d) {return d.key + ": " + d.value;});
 
-  detailText.merge(detailTextEnter)
-    .attr("x",0)
-    .attr("y", function (d,i) {
-      return i * 30;})
-    .text(function (d) {return d.key + ": " + d.value;});
-
-  detailText.exit().remove()
-
+    detailText.exit().remove()
+  }
 }
 
 function dragstarted(d) {
@@ -271,8 +289,16 @@ function dragged(d) {
         updateDetail(objectToArray(organizationData.filter(function (d) {return d.year === (i+2004);})[0]));
       }
       else {
-        updateEntities(organizationData.filter(function (d) {return (d.year === (i+2004) && d["Method of Leak"] === methodSelected);}));
-        updateDetail(objectToArray(organizationData.filter(function (d) {return (d.year === (i+2004) && d["Method of Leak"] === methodSelected);}[0])));
+        var organizations = organizationData.filter(function (d) {return (d.year === (i+2004) && d["Method of Leak"] === methodSelected);});
+        if (organizations.length !== 0) {
+          updateEntities(organizationData.filter(function (d) {return (d.year === (i+2004) && d["Method of Leak"] === methodSelected);}));
+          updateDetail(objectToArray(organizations[0]));
+        }
+        else {
+          d3.select("#entities").html("");
+          d3.select("#entities").selectAll("*").remove();
+          updateDetail();
+        }
       }
     } 
   };
