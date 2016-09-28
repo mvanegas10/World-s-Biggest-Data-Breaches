@@ -22,12 +22,6 @@ var pack = d3.pack()
   .size([800, 800])
   .padding(20);
 
-var svgChart = d3.select("#chart").append("svg")
-  .attr("width", width + margin.left + margin.right)
-  .attr("height", height + margin.top + margin.bottom)    
-  .append("g")
-  .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-
 var dataPath = [{"year":2010,"value":0},{"year":2010,"value":700000000}];
 
 var line = d3.line()
@@ -36,23 +30,6 @@ var line = d3.line()
     if (d.value === 0) return 260;
     else return -20; 
   });
-
-svgChart.append("path") 
-  .datum(dataPath)   
-  .attr("class", "line")
-  .attr("d", line)
-  .style("stroke-width","10px")
-  .style("stroke","grey")
-  .call(d3.drag()
-    .on("start", dragstarted)
-    .on("drag", dragged)
-    .on("end", dragended)); 
-
-var xAxis = svgChart.append("g")
-  .attr("class", "axis x--axis");
-
-var yAxis = svgChart.append("g")
-  .attr("class", "axis y--axis");
 
 // Data objects
 var organizationData = [];
@@ -63,6 +40,31 @@ var methodSelected = "Show all";
 var xPositions = [-359, -294, -230, -164, -99, -34, 30, 95, 161, 225, 291, 355, 420];
 
 function update(data, attrX, selected) {
+  d3.select("#chart").html("");
+  d3.select("#chart").selectAll("*").remove();
+
+  var svgChart = d3.select("#chart").append("svg")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)    
+    .append("g")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+  svgChart.append("path") 
+    .datum(dataPath)   
+    .attr("class", "line")
+    .attr("d", line)
+    .style("stroke-width","10px")
+    .style("stroke","grey")
+    .call(d3.drag()
+      .on("start", dragstarted)
+      .on("drag", dragged)
+      .on("end", dragended)); 
+
+  var xAxis = svgChart.append("g")
+    .attr("class", "axis x--axis");
+
+  var yAxis = svgChart.append("g")
+    .attr("class", "axis y--axis");
 
   var fnAccX = function(d) {return d[attrX]};
 
